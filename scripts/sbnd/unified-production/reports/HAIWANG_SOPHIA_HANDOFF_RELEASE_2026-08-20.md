@@ -1,7 +1,7 @@
 # Haiwang Sophia Handoff Release Report
 **Date:** 2026-08-20  
 **Author:** Avinay Bhat  
-**Status:** PARTIAL — S3 PASS (176019), D1 PASS (176020), S1 PASS (176027); push to abhatfnal pending user action
+**Status:** PASS — SOPHIA-FIRST UNIFIED NUGRAPH PRODUCTION HANDOFF: FROZEN, COMMITTED, PUSHED, AND CLEAN-ROOM VALIDATED
 
 ---
 
@@ -36,13 +36,22 @@ Base pywcml commit:
 a7c8728e37795d48f4582b395fac716d0585e3b0
 ```
 
-Production package commit:
+Production code commit (driver, receiver, configs, FCLs):
 ```
 838ccab6f3351fceed5d3d04f94939cd925dfadb
 ```
 
+Clean-room gates were run against this commit (nugraph clone at 838ccab).  
+Interim documentation commits: `fd7f3be`, `dc61267` (docs only — no production code changes).
+
+Validated branch tip pushed to remote:
+```
+dc61267cbe3cd430fb57211c5ec9b67af23dcefc
+```
+
 Branch: `feature/sbnd-unified-production-20260820`  
-Remote: `abhatfnal/nugraph` **(push pending — see Section 15)**
+Remote: `https://github.com/abhatfnal/nugraph`  
+Remote push verification: **PASS** (2026-08-21)
 
 ---
 
@@ -321,10 +330,24 @@ Allowed (by design):
 
 ## Final Verdict
 
-**PARTIAL** — Awaiting only:
-1. GitHub push of `feature/sbnd-unified-production-20260820` to `abhatfnal/nugraph` (requires interactive auth; user must run: `git push abhatfnal feature/sbnd-unified-production-20260820` from Sophia login node with GitHub token configured)
+**PASS — SOPHIA-FIRST UNIFIED NUGRAPH PRODUCTION HANDOFF: FROZEN, COMMITTED, PUSHED, AND CLEAN-ROOM VALIDATED**
 
-**ALL CLEAN-ROOM GATES CONFIRMED (2026-08-21):**
+### SHA provenance
+
+| Item | SHA |
+|------|-----|
+| Validated production code commit | `838ccab6f3351fceed5d3d04f94939cd925dfadb` |
+| Validated branch tip at remote push | `dc61267cbe3cd430fb57211c5ec9b67af23dcefc` |
+| Release documentation commit | see commit after `dc61267` on branch |
+| WCT | `bc7f4af928921ade590166d5993bca083a4278c0` |
+| larwirecell | `9295e2a34c32b5f92ad6483b83dd4895a00b4c9b` |
+| GitHub remote | `https://github.com/abhatfnal/nugraph` |
+| Branch | `feature/sbnd-unified-production-20260820` |
+| Remote push verification | **PASS** (2026-08-21) |
+
+Note: `838ccab` is the production code freeze (driver/receiver/configs/FCLs). The clean-room gates ran against a clone of `838ccab`. Commits `fd7f3be` and `dc61267` are documentation-only (no production code changes). The new release-documentation commit (this file) similarly changes no production code.
+
+### Clean-room gate summary
 
 | Gate | PBS | Result | Key Detail |
 |------|-----|--------|------------|
@@ -332,8 +355,4 @@ Allowed (by design):
 | S3 (sim 3-event) | 176019 | **PASS** | Bitwise identical — all 6 samples; TrackFitting state-reset confirmed |
 | D1 (data 1-event) | 176020 | **PASS** | CTPC, packaged FCL validated, BNBSpillInfo patch working |
 
-Note: S1 initial job (176018) failed due to waf race condition when co-scheduled with S3 on same node — not a pipeline bug. Resubmit 176027 PASSED standalone.
-
-Once the push succeeds, verdict upgrades to:
-
-**PASS — SOPHIA-FIRST UNIFIED NUGRAPH PRODUCTION HANDOFF: FROZEN, COMMITTED, PUSHED, AND CLEAN-ROOM VALIDATED**
+S1 initial job (176018) failed due to waf race when co-scheduled with S3 on same node — not a pipeline bug. Resubmit 176027 PASSED standalone.

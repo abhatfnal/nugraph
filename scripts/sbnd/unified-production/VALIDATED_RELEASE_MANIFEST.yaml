@@ -48,9 +48,14 @@ source_provenance:
     repo: "https://github.com/abhatfnal/nugraph.git"
     branch: "feature/sbnd-unified-production-20260820"
     base_pywcml_commit: "a7c8728e37795d48f4582b395fac716d0585e3b0"
+    production_code_commit: "838ccab6f3351fceed5d3d04f94939cd925dfadb"
+    clean_room_gates_ran_from: "838ccab6f3351fceed5d3d04f94939cd925dfadb"
+    validated_branch_tip_at_push: "dc61267cbe3cd430fb57211c5ec9b67af23dcefc"
+    remote_push_status: "PASS (2026-08-21)"
     production_package_path: "scripts/sbnd/unified-production/"
     receiver_path: "scripts/sbnd/run_canonical_receiver.py"
     campaign_id: "haiwang-nugraph4-canonical-v1"
+    note: "838ccab is the frozen production code. fd7f3be and dc61267 are docs-only commits. Clean-room gates cloned 838ccab."
 
 file_sha256:
   run_canonical_receiver_py: "cf0f9d65d96ce4fd3f54851c7f9b31e78dfdb3231f543b362232275141cadeb8"
