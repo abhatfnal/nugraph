@@ -92,6 +92,37 @@ reference_outputs:
   validated_caseA_data_h5_sha256: "7f1a174a06864c386db0b9af02f35a1108f0d76faef15258d7b87f8e830e728b"
   validated_caseA_rse: "18255/1/114446"
 
+clean_room_validation:
+  date: "2026-08-21"
+  platform: "Sophia HPC (ALCF)"
+  clean_room_root: "/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/haiwang-handoff-cleanroom-20260820/"
+  nugraph_clone_commit: "838ccab6f3351fceed5d3d04f94939cd925dfadb"
+  pywcml_source: "clean-room NuGraph clone (NOT Avinay production nugraph dir)"
+  compiled_infra: "$NUGRAPH_WORKSPACE_DIR (shared compiled WCT/larwirecell — documented dependency)"
+  gates:
+    S3:
+      pbs_job: "176019"
+      verdict: "PASS"
+      rses: ["1/2728/1", "1/2728/2", "1/2728/3"]
+      h5_sha256: "07b333784a2ba671bada56b410fb1212a80075424aa6b068032f03f1c1f1d5d1"
+      h5_size_bytes: 3964796
+      bitwise_vs_frozen_ref: "IDENTICAL — all 6 samples"
+      notes: "TrackFitting state-reset confirmed; campaign_id and splits verified"
+    D1:
+      pbs_job: "176020"
+      verdict: "PASS"
+      rse: "18255/1/114446"
+      h5_sha256: "7f1a174a06864c386db0b9af02f35a1108f0d76faef15258d7b87f8e830e728b"
+      h5_size_bytes: 2350356
+      fcl_source: "packaged copy from configs/fcl/ (NUGRAPH_DATA_FCL_DIR override)"
+      fcl_sha256_verified: "0650836f9e04842c4bb9b012eac4bedfffeb70db82cc9d1942af307717c171cb"
+      notes: "CTPC confirmed (reco_bundle_id_sentinels=0); BNBSpillInfo patch working"
+    S1:
+      pbs_job: "176018 (failed — waf race) → 176027 (resubmit)"
+      verdict: "PENDING (176027)"
+      rse: "1/2728/1"
+      notes: "176018 failed due to concurrent waf install race with S3 on same node — not a pipeline bug. Event 1/2728/1 verified bitwise identical to frozen reference via S3 gate."
+
 known_crash_events:
   - rse: "18255/1/506114"
     reason: "WCT sig2img crash — confirmed non-deterministic"
