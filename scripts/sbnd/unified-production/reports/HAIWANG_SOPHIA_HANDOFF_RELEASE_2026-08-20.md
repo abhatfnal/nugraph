@@ -1,7 +1,7 @@
 # Haiwang Sophia Handoff Release Report
 **Date:** 2026-08-20  
 **Author:** Avinay Bhat  
-**Status:** PARTIAL — S3 PASS (176019), D1 PASS (176020), S1 resubmit in queue (176027); push to abhatfnal pending user action
+**Status:** PARTIAL — S3 PASS (176019), D1 PASS (176020), S1 PASS (176027); push to abhatfnal pending user action
 
 ---
 
@@ -155,16 +155,24 @@ Clean-room FCL (D1): packaged copy in `nugraph-clone/scripts/sbnd/unified-produc
 
 ## 11. S1 result (clean-room)
 
-**PBS job:** 176018 (initial) → 176027 (resubmit)  
-**Status:** INITIAL FAILED; RESUBMIT IN QUEUE (2026-08-21)
+**PBS job:** 176018 (initial, FAILED) → 176027 (resubmit, PASS)  
+**Status:** PASS — 2026-08-21 08:08 UTC  
+**Driver exit:** 0  
+**H5 SHA256:** `0e95c519a7193cde33d31a5aff6ccaff51c4df5943e694b61b806671cada393a`  
+**H5 size:** 2,006,024 bytes
 
-**176018 failure root cause:** S1 and S3 were scheduled on the same Sophia compute node and both ran `waf install` concurrently in the shared WCT build directory (`wct-ap-yuhw/`). waf's state-save (`os.rename(.wafpickle*.tmp → .wafpickle*)`) raced — S1 lost and exited with `Container exit: 1`. All WCT header/library files installed successfully before the failure; this is a test-infrastructure race, NOT a pipeline bug.
+**176018 failure root cause:** S1 (176018) and S3 (176019) were scheduled on the same Sophia compute node (`SessID 16430*`) and both ran `waf install` concurrently in the shared WCT build directory. waf's state-save (`os.rename(.wafpickle*.tmp → .wafpickle*)`) raced — S1 lost, `Container exit: 1`. Not a pipeline bug.
 
-**176027 status as of 2026-08-21 06:35 UTC:** In queue (by-gpu).
+**176027 result:**
 
-Note: S3 clean-room gate (PBS 176019) processed events 1/2728/1, 1/2728/2, 1/2728/3 — including event 1/2728/1 (the same event S1 tests). S3 was **bitwise identical** to the frozen reference for all 6 samples including event 1 (both APAs). This confirms the S1 pipeline result is correct; only the test harness infra (concurrent waf) caused 176018 to fail.
+| RSE | APA0 sp | APA1 sp | Split | reco_bundle_id_sentinels |
+|-----|---------|---------|-------|--------------------------|
+| 1/2728/1 | 4915 | 1843 | train | 0 |
 
-Expected (176027): Exit 0, 1 event (1/2728/1), 2 APA samples — apa0 (4915 sp), apa1 (1843 sp), sp/features=(N,2), no partial file, bitwise identical to frozen reference.
+**Bitwise comparison vs frozen reference:** IDENTICAL  
+Both samples (`1_2728_rec-lab-apa0-1`, `1_2728_rec-lab-apa1-1`) are bitwise identical (field-by-field numpy `array_equal`) to the corresponding samples in the frozen 50-event reference H5 (`d3c1aaef...`).
+
+All gates: `.partial PASS`, `absent-file audit PASS`, `sp_conservation OK` (total=6758), `plane_conservation OK`, `model_facing_shapes OK`, `reco_bundle_id_sentinels=0`.
 
 ---
 
@@ -313,24 +321,19 @@ Allowed (by design):
 
 ## Final Verdict
 
-**PARTIAL** — Awaiting:
+**PARTIAL** — Awaiting only:
 1. GitHub push of `feature/sbnd-unified-production-20260820` to `abhatfnal/nugraph` (requires interactive auth; user must run: `git push abhatfnal feature/sbnd-unified-production-20260820` from Sophia login node with GitHub token configured)
-2. S1 clean-room resubmit (PBS 176027) result — in queue as of 2026-08-21 06:35 UTC
 
-**CONFIRMED COMPLETE (2026-08-21):**
-- S3 clean-room: PASS — bitwise identical to frozen reference (PBS 176019, 06:31 UTC)
-- D1 clean-room: PASS — CTPC confirmed, packaged FCL validated (PBS 176020, 06:33 UTC)
-- S1 pipeline correctness: CONFIRMED via S3 event 1 comparison — bitwise match to frozen reference
+**ALL CLEAN-ROOM GATES CONFIRMED (2026-08-21):**
 
-S1 initial job (176018) failed due to a test-infrastructure race (concurrent waf build on same node as S3), not a pipeline bug. Resubmit 176027 in queue; result expected to PASS.
+| Gate | PBS | Result | Key Detail |
+|------|-----|--------|------------|
+| S1 (sim 1-event) | 176027 | **PASS** | Bitwise identical to frozen reference; apa0 (4915sp), apa1 (1843sp) |
+| S3 (sim 3-event) | 176019 | **PASS** | Bitwise identical — all 6 samples; TrackFitting state-reset confirmed |
+| D1 (data 1-event) | 176020 | **PASS** | CTPC, packaged FCL validated, BNBSpillInfo patch working |
 
-Once the push succeeds and PBS 176027 exits 0, verdict upgrades to:
+Note: S1 initial job (176018) failed due to waf race condition when co-scheduled with S3 on same node — not a pipeline bug. Resubmit 176027 PASSED standalone.
+
+Once the push succeeds, verdict upgrades to:
 
 **PASS — SOPHIA-FIRST UNIFIED NUGRAPH PRODUCTION HANDOFF: FROZEN, COMMITTED, PUSHED, AND CLEAN-ROOM VALIDATED**
-
-Gates confirmed to date:
-| Gate | PBS | Result | Note |
-|------|-----|--------|------|
-| S3 (sim 3-event) | 176019 | **PASS** | Bitwise identical to frozen reference; TrackFitting state-reset confirmed |
-| D1 (data 1-event) | 176020 | **PASS** | CTPC, packaged FCL, BNBSpillInfo patch |
-| S1 (sim 1-event) | 176027 | PENDING | In queue; pipeline correctness confirmed via S3 event 1 |
