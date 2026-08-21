@@ -1,0 +1,52 @@
+#!/bin/bash
+#PBS -N nugraph_data
+#PBS -l select=1:ncpus=16
+#PBS -l walltime=02:30:00
+#PBS -l filesystems=home:eagle:grand
+#PBS -q by-gpu
+#PBS -A neutrinoGPU::wirecell_2026
+#PBS -j oe
+#PBS -o REPLACE_WITH_LOG_PATH
+
+# PBS submission wrapper for --mode data.
+# Edit the variables below, then submit with:
+#   qsub run_nugraph_data.pbs
+#
+# Do NOT commit or push. Do NOT overwrite frozen reference H5 files.
+# Do NOT use nc_sideband_reco2_paths_for_conversion.txt.
+# Authoritative producer manifest: nc_sideband_exact_19events_corrected_manifest.csv
+
+set -uo pipefail
+
+module load spack-pe-base
+module load apptainer
+echo "apptainer: $(apptainer version)"
+
+DRIVER=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/bin/run_nugraph_production.sh
+
+# ── Required: edit before submission ──────────────────────────────────────────
+MANIFEST=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/engineering-nc-sideband-19evt-corrected/scripts/19event_corrected/nc_sideband_exact_19events_corrected_manifest.csv
+RECEIVER_MANIFEST=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/engineering-nc-sideband-19evt-corrected/scripts/19event_corrected/nc_sideband_exact_17events_corrected_receiver_manifest.csv
+OUTPUT_H5=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/data_caseA/canonical/nugraph_data_test.h5
+OUTPUT_DIR=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/data_caseA
+REPORT=$OUTPUT_DIR/logs/receiver_report.json
+# ──────────────────────────────────────────────────────────────────────────────
+
+mkdir -p "$OUTPUT_DIR/logs"
+
+echo "PBS Job ID: ${PBS_JOBID:-local}"
+echo "Host: $(hostname)"
+echo "Time: $(date)"
+
+bash "$DRIVER" \
+    --mode data \
+    --manifest "$MANIFEST" \
+    --receiver-manifest "$RECEIVER_MANIFEST" \
+    --output-h5 "$OUTPUT_H5" \
+    --output-dir "$OUTPUT_DIR" \
+    --report "$REPORT"
+
+DRIVER_EXIT=$?
+echo "Driver exit: $DRIVER_EXIT"
+echo "Time: $(date)"
+exit $DRIVER_EXIT

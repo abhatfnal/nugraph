@@ -1,0 +1,73 @@
+
+#include "simulationservices_sbnd.fcl"
+#include "messages_sbnd.fcl"
+#include "detsim_drops.fcl"
+#include "opdetdigitizer_sbnd.fcl"
+
+# No-intermediate mode: identical reconstruction to wcls-img-clus-matching-xin.fcl
+# but with all event-data file-producing side-effects disabled:
+#   hdf5_output=false   -> no nugraph.h5
+#   ClusterFlashDump    -> no trash-all-apa.tar.gz
+#   bee_noint sink      -> no mabc.zip / no mabc-pr.zip (consolidated archive instead)
+#
+# The canonical H5 is written via EventGraphIPC + run_canonical_receiver.py.
+
+process_name: wclssig2img
+
+services:
+{
+  TFileService: { fileName: "tf-default.root" }
+  @table::sbnd_detsim_services
+  AuxDetGeometry: @local::sbnd_auxdetgeo
+  @table::sbnd_geometry_services
+}
+
+
+source: {
+   module_type: RootInput
+}
+
+physics :{
+   producers: {
+
+      sig2img : {
+         module_type : WireCellToolkit
+         wcls_main: {
+            tool_type: WCLS
+            apps: ["Pgrapher"]
+
+            logsinks: ["stdout"]
+            loglevels: ["debug"]
+
+            plugins: ["WireCellGen", "WireCellImg", "WireCellClus", "WireCellPgraph", "WireCellSio", "WireCellRoot", "WireCellLarsoft", "WireCellAux", "WireCellMatch", "WireCellAIML"]
+
+            inputers: [
+                "wclsCookedFrameSource:sigs"
+                , "wclsOpFlashSource:tpc0"
+                , "wclsOpFlashSource:tpc1"
+                , "wclsTensorSetLabeler:clus_all_apa"
+                      ]
+
+            configs: ["wcls-img-clus-matching-xin-noint.jsonnet"]
+
+            params : {
+                reality: "sim"
+                img_config: "active2view+masked2view"
+                opflash0_input_label: "opflashtpc0:"
+                opflash1_input_label: "opflashtpc1:"
+            }
+            structs : {
+                recobwire_tags: "[\"simtpc2d:dnnsp\", \"simtpc2d:dnnsp\"]"
+                trace_tags: "[\"gauss\", \"wiener\"]"
+                summary_tags: "[\"\", \"simtpc2d:wienersummary\"]"
+                input_mask_tags: "[\"simtpc2d:badmasks\"]"
+                output_mask_tags: "[\"bad\"]"
+            }
+         }
+      }
+   }
+
+   p1 : [ sig2img ]
+   trigger_paths : [ p1 ]
+
+}

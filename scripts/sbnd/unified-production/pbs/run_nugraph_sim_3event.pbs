@@ -1,0 +1,47 @@
+#!/bin/bash
+#PBS -N nugraph_sim_3evt
+#PBS -l select=1:ncpus=16
+#PBS -l walltime=01:30:00
+#PBS -l filesystems=home:eagle:grand
+#PBS -q by-gpu
+#PBS -A neutrinoGPU::wirecell_2026
+#PBS -j oe
+#PBS -o /lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/sim_3event/logs/pbs_sim_3event.log
+
+# Phase 10: 3-event sim multi-event regression test.
+# Events: 1/2728/1, 1/2728/2, 1/2728/3 (same ROOT file, single lar session).
+# Validates TrackFitting.clear_segments() state reset across events in single session.
+# Compare vs frozen 50-event reference: RSEs 1/2728/1, 1/2728/2, 1/2728/3.
+# Do NOT overwrite frozen reference H5 files.
+
+set -uo pipefail
+
+module load spack-pe-base
+module load apptainer
+echo "apptainer: $(apptainer version)"
+
+DRIVER=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/bin/run_nugraph_production.sh
+MANIFEST=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/sim_3event/sim_3event_manifest.csv
+OUTPUT_H5=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/sim_3event/canonical/sim_3event.h5
+OUTPUT_DIR=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/sim_3event
+REPORT=$OUTPUT_DIR/logs/receiver_report.json
+
+mkdir -p "$OUTPUT_DIR/logs" "$OUTPUT_DIR/canonical"
+
+echo "PBS Job ID: ${PBS_JOBID:-local}"
+echo "Host: $(hostname)"
+echo "Time: $(date)"
+echo "Phase 10: 3-event sim multi-event test (1/2728/1,2,3) — tests TrackFitting state reset"
+
+bash "$DRIVER" \
+    --mode sim \
+    --manifest "$MANIFEST" \
+    --receiver-manifest "$MANIFEST" \
+    --output-h5 "$OUTPUT_H5" \
+    --output-dir "$OUTPUT_DIR" \
+    --report "$REPORT"
+
+DRIVER_EXIT=$?
+echo "Driver exit: $DRIVER_EXIT"
+echo "Time: $(date)"
+exit $DRIVER_EXIT

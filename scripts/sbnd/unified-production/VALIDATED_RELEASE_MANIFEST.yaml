@@ -1,0 +1,123 @@
+---
+# Validated Release Manifest — Unified NuGraph Production Driver
+# Platform: Sophia HPC (ALCF)
+# Validation date: 2026-08-20
+# Author: Avinay Bhat <abhat@uchicago.edu>
+
+validation:
+  date: "2026-08-20"
+  platform: "Sophia HPC (ALCF)"
+  cluster_account: "neutrinoGPU::wirecell_2026"
+  pbs_queue: "by-gpu"
+  validated_pbs_jobs:
+    - id: "175972"
+      mode: sim
+      events: 1
+      verdict: PASS
+    - id: "175973"
+      mode: data
+      events: 1
+      verdict: PASS
+    - id: "175974"
+      mode: data
+      events: 3
+      verdict: PASS
+    - id: "175975"
+      mode: sim
+      events: 3
+      verdict: PASS
+
+source_provenance:
+  wct:
+    repo: "https://github.com/abhatfnal/wire-cell-toolkit.git"
+    branch: "pr/nugraph4-wct-integration"
+    commit: "bc7f4af928921ade590166d5993bca083a4278c0"
+    key_patches:
+      - "fix(clus): reset TrackFitting state between events (983495f)"
+      - "test(clus): add regression for TrackFitting event-state reset (9b1379e)"
+      - "Merge ap-yuhw into pr/nugraph4-wct-integration (bc7f4af9)"
+
+  larwirecell:
+    repo: "https://github.com/abhatfnal/larwirecell.git"
+    branch: "dev-v10_14_02_02"
+    commit: "9295e2a34c32b5f92ad6483b83dd4895a00b4c9b"
+    key_patches:
+      - "feat(aiml): stream EventGraph over IPC without HDF5 handoff (9295e2a3)"
+
+  nugraph:
+    repo: "https://github.com/abhatfnal/nugraph.git"
+    branch: "feature/sbnd-unified-production-20260820"
+    base_pywcml_commit: "a7c8728e37795d48f4582b395fac716d0585e3b0"
+    production_package_path: "scripts/sbnd/unified-production/"
+    receiver_path: "scripts/sbnd/run_canonical_receiver.py"
+    campaign_id: "haiwang-nugraph4-canonical-v1"
+
+file_sha256:
+  run_canonical_receiver_py: "cf0f9d65d96ce4fd3f54851c7f9b31e78dfdb3231f543b362232275141cadeb8"
+  run_nugraph_production_sh:  "3f76ead8555d01d47927b84837cae16b2fe664db8bfad92cad9d605f8a6f28cb"
+  common_sh:                  "615e0e654539d299472c13b5f146ea18feabb730e2128f3f0fccca9d1b83f187"
+  run_sim_container_sh:       "b9ad691a7815a928ace2a299bbd1400215436bdfa0abfd770839f24558ce04e1"
+  run_data_container_sh:      "02612f55ba298cde7585b1f571e7f53138ecd62e58bbb75a1c85b1c476106683"
+  sim_fcl:                    "857af5c3a4d0fcdfabcda79fedb96770e38b4cdf9a65fb36bbbe40052fadd39a"
+  data_fcl:                   "0650836f9e04842c4bb9b012eac4bedfffeb70db82cc9d1942af307717c171cb"
+
+fcl:
+  sim:
+    name: "wcls-img-clus-matching-xin-noint.fcl"
+    sha256: "857af5c3a4d0fcdfabcda79fedb96770e38b4cdf9a65fb36bbbe40052fadd39a"
+    canonical_location: "$NUGRAPH_WORKSPACE_DIR/wcp-porting/sbnd/"
+    packaged_copy: "scripts/sbnd/unified-production/configs/fcl/wcls-img-clus-matching-xin-noint.fcl"
+  data:
+    name: "wcls-img-clus-matching-xin-data-noint.fcl"
+    sha256: "0650836f9e04842c4bb9b012eac4bedfffeb70db82cc9d1942af307717c171cb"
+    canonical_location: "engineering-nc-sideband-19evt-new-pipeline/scripts/19event_run_v1/"
+    packaged_copy: "scripts/sbnd/unified-production/configs/fcl/wcls-img-clus-matching-xin-data-noint.fcl"
+
+container:
+  sif: "/lus/grand/projects/neutrinoGPU/software/containers/slf7.sif"
+  sif_sha256: "e38342b81f49e0d8c292f8d61e3edd1af64801be01f484ef457ee7ce291cf1ff"
+  larsoft_squashfs: "/lus/eagle/projects/neutrinoGPU/larsoft_hpc/images/larsoft-v10_14_02.squashfs"
+  sbnd_delta_squashfs: "/lus/eagle/projects/neutrinoGPU/larsoft_hpc/images/sbnd-v10_14_02_04_delta.squashfs"
+  larsoft_version: "v10_14_02"
+  sbnd_version: "v10_14_02_04"
+
+python_environment:
+  validated_path: "/lus/eagle/projects/neutrinoGPU/abhat/conda/envs/numl/bin/python"
+  env_var_override: "NUGRAPH_NUML_PY"
+  note: "Haiwang must create his own conda environment with equivalent packages (h5py, numpy, torch, torch_geometric)"
+
+reference_outputs:
+  frozen_50event_sim_h5_sha256: "d3c1aaefbd6b7b33e2f5ad10f1cf030051003d419f4d43d37d22ae7639cb6a10"
+  frozen_50event_sim_h5_note: "Reference for gate S50; do NOT overwrite"
+  validated_caseA_data_h5_sha256: "7f1a174a06864c386db0b9af02f35a1108f0d76faef15258d7b87f8e830e728b"
+  validated_caseA_rse: "18255/1/114446"
+
+known_crash_events:
+  - rse: "18255/1/506114"
+    reason: "WCT sig2img crash — confirmed non-deterministic"
+  - rse: "18259/1/37112"
+    reason: "WCT sig2img crash — confirmed non-deterministic"
+  note: "Do NOT use these events as handoff gates or include in production manifests"
+
+configurable_env_vars:
+  NUGRAPH_WORKSPACE_DIR:
+    description: "WCT/larwirecell/mrb-dev/opt workspace root"
+    default: "/lus/eagle/projects/neutrinoGPU/abhat/sbnd/sample_generation_port/work/haiwang-current"
+    haiwang_instructions: "Set to your own workspace directory (see SOPHIA_REPRODUCTION_RUNBOOK.md)"
+  NUGRAPH_NUML_PY:
+    description: "Python interpreter with pywcml/nugraph packages"
+    default: "/lus/eagle/projects/neutrinoGPU/abhat/conda/envs/numl/bin/python"
+    haiwang_instructions: "Set to your Python env (conda activate your_env; which python)"
+  NUGRAPH_PYWCML_DIR:
+    description: "NuGraph repo root for PYTHONPATH (contains pywcml/ package)"
+    default_sim: "/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/nugraph"
+    default_data: "/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/nugraph-sophia-dev"
+    haiwang_instructions: "Set to your NuGraph clone root"
+  NUGRAPH_RECEIVER:
+    description: "Path to run_canonical_receiver.py"
+    default: "auto-detected relative to driver (scripts/sbnd/run_canonical_receiver.py)"
+    haiwang_instructions: "No override needed if using the NuGraph repo clone"
+  NUGRAPH_DATA_FCL_DIR:
+    description: "Directory containing data FCL"
+    default: "engineering-nc-sideband-19evt-new-pipeline/scripts/19event_run_v1/"
+    haiwang_instructions: "Point to configs/fcl/ in your NuGraph clone (packaged copy is SHA-verified)"

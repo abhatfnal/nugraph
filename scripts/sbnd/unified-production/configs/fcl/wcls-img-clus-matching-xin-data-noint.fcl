@@ -1,0 +1,16 @@
+# wcls-img-clus-matching-xin-data-noint.fcl
+# COPY - do NOT edit validated originals.
+# Parent A (no-intermediate IPC transport): wcp-porting/sbnd/wcls-img-clus-matching-xin-noint.fcl
+# Parent B (real-data mode):               wcp-porting/sbnd/wcls-img-clus-matching-xin-data.fcl
+#
+# Changes vs parent A: reality=data, sptpc2d:dnnsp wire/summary/mask tags.
+# Changes vs parent B: noint.jsonnet (IPC EventGraph), TFileService off, no intermediate h5.
+# Verified data product: sptpc2d:dnnsp (real data; NOT simtpc2d:dnnsp MC product).
+
+#include "wcls-img-clus-matching-xin-noint.fcl"
+
+# REAL-DATA OVERRIDES (from wcls-img-clus-matching-xin-data.fcl)
+physics.producers.sig2img.wcls_main.params.reality:          "data"
+physics.producers.sig2img.wcls_main.structs.recobwire_tags:  "[\"sptpc2d:gauss\", \"sptpc2d:wiener\"]"
+physics.producers.sig2img.wcls_main.structs.summary_tags:    "[\"\", \"sptpc2d:wienersummary\"]"
+physics.producers.sig2img.wcls_main.structs.input_mask_tags: "[\"sptpc2d:badmasks\"]"

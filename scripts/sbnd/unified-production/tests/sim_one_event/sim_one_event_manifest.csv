@@ -1,0 +1,2 @@
+source_index,input_file,nskip,run,subrun,event,input_sha256
+0,/lus/eagle/projects/neutrinoGPU/abhat/sbnd/sample_generation_port/reference/extracted/02_workflow_test/test/test/prodgenie_bnb_nu_cosmic_sbnd_GenieGen-20260104T001558_G4-20260104T005212_589a580c-89e6-48bc-a036-f853689b5be3_DetSim-20260104T211819_DecoReco_CellTreeAPA0-20260109T035038.root,0,1,2728,1,237b21363faba11fca49e54ce3f7f3b6faca5f4536887ca438332d2d19bb3b0a

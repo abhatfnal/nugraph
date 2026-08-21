@@ -1,0 +1,46 @@
+#!/bin/bash
+#PBS -N nugraph_data_3evt
+#PBS -l select=1:ncpus=16
+#PBS -l walltime=01:30:00
+#PBS -l filesystems=home:eagle:grand
+#PBS -q by-gpu
+#PBS -A neutrinoGPU::wirecell_2026
+#PBS -j oe
+#PBS -o /lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/data_3event/logs/pbs_data_3event.log
+
+# Phase 10: 3-event data multi-event regression test.
+# Events: 18255/1/114446, 18255/1/142421, 18255/1/180801 (3 distinct ROOT files)
+# Validates multi-session receiver behavior for --mode data.
+# Do NOT overwrite frozen reference H5 or one-event smoke test outputs.
+
+set -uo pipefail
+
+module load spack-pe-base
+module load apptainer
+echo "apptainer: $(apptainer version)"
+
+DRIVER=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/bin/run_nugraph_production.sh
+MANIFEST=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/data_3event/data_3event_manifest.csv
+OUTPUT_H5=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/data_3event/canonical/data_3event.h5
+OUTPUT_DIR=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/tests/data_3event
+REPORT=$OUTPUT_DIR/logs/receiver_report.json
+
+mkdir -p "$OUTPUT_DIR/logs"
+
+echo "PBS Job ID: ${PBS_JOBID:-local}"
+echo "Host: $(hostname)"
+echo "Time: $(date)"
+echo "Phase 10: 3-event data multi-event test (18255/1/114446,142421,180801)"
+
+bash "$DRIVER" \
+    --mode data \
+    --manifest "$MANIFEST" \
+    --receiver-manifest "$MANIFEST" \
+    --output-h5 "$OUTPUT_H5" \
+    --output-dir "$OUTPUT_DIR" \
+    --report "$REPORT"
+
+DRIVER_EXIT=$?
+echo "Driver exit: $DRIVER_EXIT"
+echo "Time: $(date)"
+exit $DRIVER_EXIT
