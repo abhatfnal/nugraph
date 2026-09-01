@@ -22,7 +22,7 @@ module load spack-pe-base
 module load apptainer
 echo "apptainer: $(apptainer version)"
 
-DRIVER=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/unified-nugraph-production/bin/run_nugraph_production.sh
+DRIVER=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/nugraph-sophia-dev/scripts/sbnd/unified-production/bin/run_nugraph_production.sh
 
 # ── Required: edit before submission ──────────────────────────────────────────
 MANIFEST=/lus/eagle/projects/neutrinoGPU/abhat/sbnd/clustering/engineering-nc-sideband-19evt-corrected/scripts/19event_corrected/nc_sideband_exact_19events_corrected_manifest.csv
